@@ -39,7 +39,7 @@ test('the skip link is the first stop and moves focus to the main content', asyn
   await expect(page.locator('main')).toBeFocused()
 })
 
-test('production pages carry a Content-Security-Policy limited to the site itself', async ({
+test('production pages carry a Content-Security-Policy limited to the site and the diya count', async ({
   page,
 }) => {
   await page.goto('/')
@@ -47,6 +47,7 @@ test('production pages carry a Content-Security-Policy limited to the site itsel
     .locator('meta[http-equiv="Content-Security-Policy"]')
     .getAttribute('content')
   expect(csp).toContain("default-src 'self'")
-  expect(csp).toContain("connect-src 'self'")
-  expect(csp).not.toMatch(/https?:/)
+  // The one address outside the site: Firestore, for the shared count of lit diyas.
+  expect(csp).toContain("connect-src 'self' https://firestore.googleapis.com")
+  expect(csp?.match(/https?:\/\/[^\s;]+/g)).toEqual(['https://firestore.googleapis.com'])
 })

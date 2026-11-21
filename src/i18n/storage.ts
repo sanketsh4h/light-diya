@@ -3,8 +3,8 @@
  * windows, blocked site data), so every access is guarded and failure is
  * silent: the site works the same, it just does not remember.
  *
- * localStorage holds only: the language choice, the day's word-game guesses,
- * the doodle best score and the doodle player's name. Nothing else may be stored.
+ * localStorage holds only: the language choice and a random id for this
+ * device (see src/crowd/crowd.ts). Nothing else may be stored.
  */
 export function readStored(key: string): string | null {
   try {

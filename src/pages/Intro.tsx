@@ -5,27 +5,38 @@ import { DiyaLighting } from '../components/DiyaLighting'
 import { Fireworks } from '../components/Fireworks'
 import { introMotionAllowed } from '../components/intro-motion'
 import { EventTitle } from '../components/EventTitle'
+import { CrowdBar } from '../crowd/CrowdBar'
+import { useDiyaCrowd } from '../crowd/useDiyaCrowd'
 import styles from './pages.module.css'
 
-/** The whole site: light the diya, and the welcome and the fireworks appear. */
+/**
+ * The whole site. Each visitor lights their own diya; a bar then fills as
+ * other people light theirs on their own devices. When enough have, the
+ * fireworks begin and the welcome appears.
+ */
 export default function Intro() {
   const { t } = useI18n()
   usePage(t('site.event'))
-  /** Every visit starts unlit; the welcome lines stay out of sight until then. */
+  /** Every visit starts unlit. */
   const [lit, setLit] = useState(false)
-  const [fireworks, setFireworks] = useState(false)
-
-  function onDiyaLit() {
-    setLit(true)
-    if (introMotionAllowed()) setFireworks(true)
-  }
+  const [motion] = useState(introMotionAllowed)
+  const crowd = useDiyaCrowd(lit)
+  /** The welcome lines and the fireworks wait for the whole crowd. */
+  const revealed = lit && crowd.complete
 
   return (
     <>
-      {fireworks && <Fireworks />}
+      {revealed && motion && <Fireworks />}
       <div className={styles.hero}>
-        <DiyaLighting onLit={onDiyaLit} />
-        <div className={styles.welcome} data-lit={lit ? 'true' : 'false'} data-testid="welcome">
+        <DiyaLighting onLit={() => setLit(true)} />
+        {crowd.enabled && (
+          <CrowdBar visible={lit} count={crowd.count} goal={crowd.goal} complete={crowd.complete} />
+        )}
+        <div
+          className={styles.welcome}
+          data-revealed={revealed ? 'true' : 'false'}
+          data-testid="welcome"
+        >
           <EventTitle />
           <p className={styles.heroValue} data-testid="atmiyata">
             {t('site.value')}

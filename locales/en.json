@@ -19,6 +19,10 @@
   "intro.diya.keys": "Press Enter to light the diya, or Escape to put the fuljadi away.",
   "intro.diya.fuljadi": "Fuljadi — drag to the diya, or press Enter to light it",
   "intro.diya.lit": "The diya is lit. Welcome.",
+  "intro.wait.label": "Let’s wait for others to light their diya",
+  "intro.wait.counting": "Counting the diyas…",
+  "intro.wait.count": "{count} of {goal} diyas lit",
+  "intro.wait.done": "All {goal} diyas are lit.",
   "notFound.title": "Page not found",
   "notFound.body": "We could not find that page.",
   "notFound.home": "Go to the home page"

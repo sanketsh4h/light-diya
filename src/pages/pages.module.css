@@ -10,7 +10,7 @@
 }
 
 /*
- * The welcome lines appear only once the diya is lit. They keep their place
+ * The welcome lines appear only once enough diyas are lit. They keep their place
  * in the layout while hidden, so nothing moves when they fade in.
  */
 .welcome {
@@ -19,13 +19,13 @@
     transform 900ms ease;
 }
 
-.welcome[data-lit='false'] {
+.welcome[data-revealed='false'] {
   opacity: 0;
   transform: translateY(8px);
   user-select: none;
 }
 
-.welcome[data-lit='true'] {
+.welcome[data-revealed='true'] {
   opacity: 1;
   transform: none;
 }
@@ -35,7 +35,7 @@
     transition: opacity 200ms ease;
   }
 
-  .welcome[data-lit='false'] {
+  .welcome[data-revealed='false'] {
     transform: none;
   }
 }
