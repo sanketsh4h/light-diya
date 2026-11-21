@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Annakut Mahotsav 2026 Digital Outreach: light the diya with a fuljadi, and the fireworks begin.",
+  "description": "Annakut Mahotsav 2026: light the diya with a fuljadi, and the fireworks begin.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build && node scripts/postbuild.mjs",

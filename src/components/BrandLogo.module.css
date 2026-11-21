@@ -1,12 +1,14 @@
 /*
- * --logo-h sets the size. The suffix is sized and lifted from it so its
- * capitals match the height and baseline of "HARISUMIRAN" in the artwork,
- * which fills rows 194 to 263 of the 1280 x 287 image.
+ * --logo-h sets the size. The subtitle under the artwork matches the
+ * "HARIPRABODHAM" line in the lockup (small bold caps) and is indented to
+ * sit under "HARISUMIRAN", past the mandala mark (~20% of the artwork width).
  */
 .logo {
   --logo-h: 48px;
   display: inline-flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--logo-h) * 0.06);
 }
 
 .artwork {
@@ -19,12 +21,14 @@
   mask: url('../assets/brand/harisumiran-sf-logo.webp') center / contain no-repeat;
 }
 
-.suffix {
-  margin-left: calc(var(--logo-h) * 0.16);
-  padding-bottom: calc(var(--logo-h) * 0.04);
+.subtitle {
+  /* Same left edge as HARISUMIRAN in the artwork (~413/1280); Hariprabodham-sized caps. */
+  margin-left: calc(var(--logo-h) * 1280 / 287 * 0.3227);
+  color: inherit;
   font-family: var(--font-sans);
-  font-size: calc(var(--logo-h) * 0.32);
-  font-weight: 500;
-  letter-spacing: 0.12em;
+  font-size: calc(var(--logo-h) * 0.165);
+  font-weight: 700;
+  letter-spacing: 0.06em;
   line-height: 1;
+  text-transform: uppercase;
 }

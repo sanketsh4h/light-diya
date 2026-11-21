@@ -6,15 +6,15 @@ import type { Lang } from '../i18n/languages'
  */
 
 /** The organisation's name, used in the footer. Not translated; shown in capitals. */
-export const BRAND_NAME = 'Harisumiran SF'
+export const BRAND_NAME = 'Harisumiran Bhoolku Pradesh'
 
 /**
  * The header logo (src/assets/brand/harisumiran-sf-logo.webp) reads
- * "HARISUMIRAN"; this suffix is set after it in matching type. The alt text
- * is the logo's accessible name.
+ * "HARISUMIRAN"; "BHOOLKU PRADESH" sits under it in the Hariprabodham line
+ * style. The alt text is the logo's accessible name.
  */
-export const BRAND_LOGO_SUFFIX = 'SF'
-export const BRAND_LOGO_ALT = 'Harisumiran SF — A Hariprabodham Parivar Event'
+export const BRAND_LOGO_SUBTITLE = 'Bhoolku Pradesh'
+export const BRAND_LOGO_ALT = 'Harisumiran Bhoolku Pradesh — A Hariprabodham Parivar Event'
 
 /** The copyright holder named at the foot of every page. Not translated. */
 export const COPYRIGHT_HOLDER = 'The Bay Labs'
@@ -46,9 +46,3 @@ export const TRANSLATION_REVIEWED: Record<Lang, boolean> = {
 export const STORAGE_KEYS = {
   lang: 'outreach.lang',
 } as const
-
-/**
- * sessionStorage key set when the intro diya has been lit in this tab
- * (see src/components/diya-lit.ts). Cleared when the tab closes.
- */
-export const DIYA_LIT_SESSION_KEY = 'outreach.diya.lit'

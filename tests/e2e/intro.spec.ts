@@ -2,9 +2,9 @@ import { expect, test, type Page } from '@playwright/test'
 import { expectNoAxeViolations } from './helpers'
 
 /**
- * The site treats an automated browser as having already lit the intro diya
- * (src/components/diya-lit.ts), so every other test starts with it lit.
- * These tests hide that flag to go through the lighting itself.
+ * The site plays no opening fade-in or fireworks in an automated browser
+ * (src/components/intro-motion.ts). These tests hide that flag, so the
+ * lighting runs as it does for a visitor, fireworks included.
  */
 async function visitAsAPerson(page: Page): Promise<void> {
   await page.addInitScript(() => {
@@ -33,6 +33,9 @@ test.describe('lighting the intro diya', () => {
     await visitAsAPerson(page)
     await expect(page.getByRole('button', { name: 'Light the diya' })).toBeVisible()
     await expect(page.getByTestId('fireworks')).toHaveCount(0)
+    // The title, "Atmiyata" and the theme line are out of sight until it is lit.
+    await expect(page.getByTestId('welcome')).toHaveCSS('opacity', '0')
+    await expect(page.getByText('Digital Outreach')).toHaveCount(0)
     await expectNoAxeViolations(page)
   })
 
@@ -60,11 +63,15 @@ test.describe('lighting the intro diya', () => {
     await expect(page.getByText('The diya is lit. Welcome.')).toBeVisible()
     await expect(fuljadi).toHaveCount(0)
     await expect(page.getByTestId('fireworks')).toBeVisible()
+    await expect(page.getByTestId('welcome')).toHaveCSS('opacity', '1')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Annakut Mahotsav 2026')
 
-    // Lit once, it stays lit for the tab, and the fireworks do not replay.
+    // Nothing is remembered: the next visit starts with an unlit diya again.
     await page.reload()
-    await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'true')
+    await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'false')
+    await expect(page.getByRole('button', { name: 'Light the diya' })).toBeVisible()
     await expect(page.getByTestId('fireworks')).toHaveCount(0)
+    await expect(page.getByTestId('welcome')).toHaveCSS('opacity', '0')
   })
 
   test('the keyboard alone can light the diya, or put the fuljadi away', async ({ page }) => {
@@ -101,6 +108,8 @@ test.describe('lighting the intro diya', () => {
       await expect(page.getByTestId('fuljadi')).toHaveCount(0)
       await expect(page.getByText('The diya is lit. Welcome.')).toBeVisible()
       await expect(page.getByTestId('fireworks')).toHaveCount(0)
+      await expect(page.getByTestId('welcome')).toHaveCSS('opacity', '1')
+      await expectNoAxeViolations(page)
     })
   })
 })

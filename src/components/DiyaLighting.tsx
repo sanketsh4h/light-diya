@@ -10,7 +10,6 @@ import { createPortal } from 'react-dom'
 import { useI18n } from '../i18n/context'
 import { usePrefersReducedMotion } from './motion'
 import { focusElement } from './focus'
-import { isDiyaLit, markDiyaLit } from './diya-lit'
 import { DiyaLamp } from './DiyaLamp'
 import { Fuljadi } from './Fuljadi'
 import styles from './DiyaLighting.module.css'
@@ -63,8 +62,8 @@ export function DiyaLighting({ onLit }: { onLit?: () => void }) {
   const returnFocusRef = useRef(false)
   /** The diya was lit from a focused control: focus moves on to the "lit" note. */
   const focusNoteRef = useRef(false)
-  // Automated browsers start lit (see isDiyaLit), so e2e skips the ritual.
-  const [lit, setLit] = useState(isDiyaLit)
+  // Every visit starts unlit: nothing remembers an earlier lighting.
+  const [lit, setLit] = useState(false)
   const [fuljadiOut, setFuljadiOut] = useState(false)
   /** The fuljadi was brought out from the keyboard, so show the key hint. */
   const [byKeyboard, setByKeyboard] = useState(false)
@@ -89,7 +88,6 @@ export function DiyaLighting({ onLit }: { onLit?: () => void }) {
     if (active && (active === handleRef.current || active === lightBtnRef.current)) {
       focusNoteRef.current = true
     }
-    markDiyaLit()
     litRef.current = true
     setLit(true)
     setLeaving(true)

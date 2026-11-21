@@ -14,7 +14,7 @@ export function Layout() {
   const [page, setPage] = useState<PageInfo>({ title: '' })
   const mainRef = useRef<HTMLElement>(null)
   const isFirstRender = useRef(true)
-  const siteTitle = t('site.title')
+  const siteTitle = t('site.event')
   const [intro] = useState(introMotionAllowed)
 
   useEffect(() => {

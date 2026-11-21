@@ -13,13 +13,15 @@ brings out a burning fuljadi, touches it to the wick, and the fireworks begin.
 
 ## What the page does
 
-1. **Unlit diya.** The page shows the diya, the line "Light the diya to begin
-   Annakut Mahotsav" and a **Light the diya** button.
+1. **Unlit diya.** The page shows only the diya, the line "Light the diya to
+   begin Annakut Mahotsav" and a **Light the diya** button.
 2. **Fuljadi.** The button brings out a burning fuljadi above the word
    "harmony". Drag it anywhere on the screen; when its tip reaches the wick,
    the diya lights.
-3. **Fireworks.** Lighting the diya starts the fireworks and shows "The diya
-   is lit. Welcome."
+3. **Welcome and fireworks.** Lighting the diya starts the fireworks and
+   brings in "The diya is lit. Welcome.", the title "Annakut Mahotsav 2026",
+   "Atmiyata" and "True happiness lies in living in harmony". These lines are
+   out of sight until then, though screen readers can read them at any time.
 
 Things to know:
 
@@ -27,9 +29,8 @@ Things to know:
   Space again lights the diya; Escape puts the fuljadi away.
 - **Reduced motion:** for visitors whose device asks for less motion, one
   press lights the diya, with no fuljadi and no fireworks.
-- **Lit for the tab:** once lit, the diya stays lit until the tab is closed.
-  Reloading shows the lit diya without replaying the fireworks. Open a new tab
-  to light it again.
+- **Every visit:** nothing is remembered. Each time the page is opened or
+  reloaded, the diya is unlit again and lighting it starts the fireworks.
 - **Other addresses:** any address other than the home page shows "Page not
   found" with a link back.
 
@@ -83,7 +84,6 @@ carry a Content-Security-Policy that allows only the site's own origin.
 | `src/components/Fuljadi.tsx`      | The fuljadi and its sparks                        |
 | `src/components/DiyaLamp.tsx`     | The diya drawing, unlit and lit                   |
 | `src/components/Fireworks.tsx`    | The fireworks canvas                              |
-| `src/components/diya-lit.ts`      | Remembers for the tab that the diya has been lit  |
 | `src/components/Layout.tsx`       | Header (logo, language switch), main area, footer |
 | `src/i18n/`                       | Language detection, storage and lookup            |
 | `locales/`                        | Interface text                                    |
@@ -91,10 +91,10 @@ carry a Content-Security-Policy that allows only the site's own origin.
 
 ### Tests
 
-The browser tests treat an automated browser as having already lit the diya,
-so most of them start with it lit. `tests/e2e/intro.spec.ts` hides that flag
-and goes through the lighting itself: by dragging, by keyboard, and with
-reduced motion. Every page is also checked with axe for accessibility
+The site plays no opening fade-in or fireworks in an automated browser, where
+a page mid-fade would fail colour-contrast checks. `tests/e2e/intro.spec.ts`
+hides that flag and goes through the lighting as a visitor does: by dragging,
+by keyboard, and with reduced motion. Every page is also checked with axe for accessibility
 violations, for horizontal overflow, and for requests that leave the site.
 
 ## Hosting
