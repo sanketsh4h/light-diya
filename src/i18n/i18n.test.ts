@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { detectLang, isLang } from './languages'
+import en from '../../locales/en.json'
+import gu from '../../locales/gu.json'
 import { interpolate, translate } from './messages'
 import { localize, localizedLang } from './localized'
 
@@ -39,10 +41,23 @@ describe('interpolate', () => {
 
 describe('translate', () => {
   it('uses the chosen language', () => {
-    expect(translate('gu', 'part.prasang.title')).toBe('પ્રસંગ')
+    expect(translate('gu', 'intro.diya.light')).toBe('દીવો પ્રગટાવો')
+    expect(translate('en', 'intro.diya.light')).toBe('Light the diya')
   })
-  it('interpolates in every language', () => {
-    expect(translate('gu', 'nav.back', { page: 'X' })).toContain('X')
+})
+
+describe('locales', () => {
+  const placeholders = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
+  it('every string has Gujarati text with the same placeholders', () => {
+    const guText: Record<string, string> = gu
+    for (const [key, text] of Object.entries(en)) {
+      expect(text.trim(), `en "${key}"`).not.toBe('')
+      expect(guText[key]?.trim(), `gu "${key}"`).toBeTruthy()
+      expect(placeholders(guText[key] ?? ''), `placeholders in gu "${key}"`).toEqual(
+        placeholders(text),
+      )
+    }
+    expect(Object.keys(guText).sort()).toEqual(Object.keys(en).sort())
   })
 })
 

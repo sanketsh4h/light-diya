@@ -3,34 +3,12 @@ import {
   LANGS,
   expectNoAxeViolations,
   expectNoHorizontalOverflow,
-  skipAudio,
   trackExternalRequests,
   useLanguage,
 } from './helpers'
 
-const ROUTES = [
-  '/',
-  '/bhulkao',
-  '/yuvako',
-  '/bhulkao/activity',
-  '/yuvako/activity',
-  '/bhulkao/activity/doodle',
-  '/yuvako/activity/pills',
-  '/yuvako/activity/words',
-  '/bhulkao/scenario',
-  '/yuvako/scenario',
-  '/bhulkao/prasang',
-  '/yuvako/prasang',
-  '/bhulkao/scenario/homework-time',
-  '/yuvako/scenario/one-am-exam',
-  '/yuvako/scenario/group-chat-joke',
-  '/yuvako/scenario/extra-change',
-  '/bhulkao/prasang/sparrows-and-the-sea',
-  '/yuvako/prasang/lamp-by-the-window',
-  '/bhulkao/scenario/no-such-story',
-  '/yuvako/prasang/no-such-prasang',
-  '/no-such-page',
-]
+/** The diya page, and an address that does not exist (the not-found page). */
+const ROUTES = ['/', '/no-such-page']
 
 for (const lang of LANGS) {
   test.describe(`every route in ${lang}`, () => {
@@ -38,7 +16,6 @@ for (const lang of LANGS) {
       test(route, async ({ page, baseURL }) => {
         const external = trackExternalRequests(page, baseURL!)
         await useLanguage(page, lang)
-        await skipAudio(page)
         await page.goto(route)
         await expect(page.locator('h1')).toHaveCount(1)
         await expect(page.locator('h1')).toBeVisible()
@@ -51,3 +28,10 @@ for (const lang of LANGS) {
     }
   })
 }
+
+test('the not-found page leads back to the diya', async ({ page }) => {
+  await page.goto('/bhulkao')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Page not found')
+  await page.getByRole('link', { name: 'Go to the home page' }).click()
+  await expect(page.getByTestId('diya-lighting')).toBeVisible()
+})

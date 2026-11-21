@@ -18,15 +18,6 @@ export async function useLanguage(page: Page, lang: Lang): Promise<void> {
   }, lang)
 }
 
-/**
- * Block audio files. The Bhulkao film streams its soundtrack for as long as it
- * plays, so a page that is playing never reaches "network idle". Without the
- * audio the film waits on its "Tap to start" screen, which is still checked.
- */
-export async function skipAudio(page: Page): Promise<void> {
-  await page.route(/\.(mp3|m4a|ogg|wav)(\?|$)/, (route) => route.abort())
-}
-
 /** Fail on any request that leaves the site's own origin. */
 export function trackExternalRequests(page: Page, baseURL: string): string[] {
   const origin = new URL(baseURL).origin

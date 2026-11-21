@@ -25,8 +25,6 @@ jobs:
         run: npm run format:check
       - name: Type check
         run: npm run typecheck
-      - name: validate (content and translations)
-        run: npm run validate:strict
       - name: Unit tests
         run: npm test
       - name: Build

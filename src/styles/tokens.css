@@ -83,19 +83,3 @@
   --shadow-raised: 0 10px 34px rgb(26 16 45 / 35%), 0 0 0 1px rgb(237 189 116 / 25%);
   --transition: 200ms ease;
 }
-
-/* Bhulkao: picture-led, larger type, rounder shapes, tap targets of 56px or more. */
-[data-section='bhulkao'] {
-  --radius: 12px;
-  --radius-small: 8px;
-  --tap: 56px;
-  --font-size: 1.125rem;
-  --font-size-lead: 1.25rem;
-  --font-size-h1: 2.5rem;
-  --font-size-h2: 1.625rem;
-}
-
-/* Yuvako: calmer, text-led, tap targets of 44px or more. */
-[data-section='yuvako'] {
-  --tap: 44px;
-}

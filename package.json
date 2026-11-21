@@ -3,13 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Digital Outreach: a static, mobile-first website with games, stories and prasangs for Bhulkao and Yuvako.",
+  "description": "Annakut Mahotsav 2026 Digital Outreach: light the diya with a fuljadi, and the fireworks begin.",
   "scripts": {
     "dev": "vite",
-    "build": "npm run validate && tsc -b && vite build && node scripts/postbuild.mjs",
+    "build": "tsc -b && vite build && node scripts/postbuild.mjs",
     "preview": "vite preview",
-    "validate": "tsx scripts/validate-content.ts",
-    "validate:strict": "tsx scripts/validate-content.ts --strict",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -24,13 +22,9 @@
     "@fontsource/noto-sans": "^5.3.0",
     "@fontsource/noto-sans-gujarati": "^5.3.0",
     "@vercel/analytics": "^2.0.1",
-    "firebase": "^13.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-markdown": "^10.1.0",
-    "react-router": "^8.5.1",
-    "yaml": "^2.9.1",
-    "zod": "^4.6.7"
+    "react-router": "^8.5.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -45,7 +39,6 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.14.0",
     "prettier": "^3.10.1",
-    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.8",

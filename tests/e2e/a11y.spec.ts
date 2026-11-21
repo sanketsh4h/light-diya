@@ -1,5 +1,4 @@
 import { expect, test, type Page } from '@playwright/test'
-import { expectNoAxeViolations, expectNoHorizontalOverflow, skipAudio } from './helpers'
 
 /** Every visible link and button on the page must be at least this tall (and 24px wide). */
 async function expectTapTargets(page: Page, minHeight: number) {
@@ -21,31 +20,8 @@ async function expectTapTargets(page: Page, minHeight: number) {
 }
 
 test.describe('tap targets', () => {
-  for (const path of [
-    '/bhulkao',
-    '/bhulkao/activity',
-    '/bhulkao/scenario/homework-time',
-    '/bhulkao/prasang/sparrows-and-the-sea',
-    '/bhulkao/activity/doodle',
-  ]) {
-    test(`Bhulkao ${path}: 56px or more`, async ({ page }) => {
-      await skipAudio(page)
-      await page.goto(path)
-      await page.waitForLoadState('networkidle')
-      await expectTapTargets(page, 56)
-    })
-  }
-  for (const path of [
-    '/',
-    '/yuvako',
-    '/yuvako/activity',
-    '/yuvako/scenario',
-    '/yuvako/scenario/one-am-exam',
-    '/yuvako/prasang/lamp-by-the-window',
-    '/yuvako/activity/pills',
-    '/yuvako/activity/words',
-  ]) {
-    test(`Yuvako and shared ${path}: 44px or more`, async ({ page }) => {
+  for (const path of ['/', '/no-such-page']) {
+    test(`${path}: 44px or more`, async ({ page }) => {
       await page.goto(path)
       await page.waitForLoadState('networkidle')
       await expectTapTargets(page, 44)
@@ -53,29 +29,8 @@ test.describe('tap targets', () => {
   }
 })
 
-test('every game, story and prasang is within three taps of the intro page', async ({ page }) => {
-  const journeys: [string, string, string | null, RegExp][] = [
-    ['Bhulkao', 'Activity', 'Doodle Catcher', /\/bhulkao\/activity\/doodle$/],
-    ['Bhulkao', 'Scenario', null, /\/bhulkao\/scenario\/homework-time$/],
-    ['Bhulkao', 'Prasang', null, /\/bhulkao\/prasang\/sparrows-and-the-sea$/],
-    ['Yuvako', 'Activity', 'Choose your reality', /\/yuvako\/activity\/pills$/],
-    ['Yuvako', 'Activity', 'Shabd Khoj', /\/yuvako\/activity\/words$/],
-    ['Yuvako', 'Scenario', '1 a.m.', /\/yuvako\/scenario\/one-am-exam$/],
-    ['Yuvako', 'Scenario', 'The Group Chat', /\/yuvako\/scenario\/group-chat-joke$/],
-    ['Yuvako', 'Scenario', 'The Extra Change', /\/yuvako\/scenario\/extra-change$/],
-    ['Yuvako', 'Prasang', null, /\/yuvako\/prasang\/lamp-by-the-window$/],
-  ]
-  for (const [section, part, item, target] of journeys) {
-    await page.goto('/')
-    await page.getByRole('link', { name: new RegExp(`^${section}`) }).click()
-    await page.getByRole('link', { name: new RegExp(`^${part}`) }).click()
-    if (item) await page.getByRole('link', { name: new RegExp(`^${item}`) }).click()
-    await expect(page).toHaveURL(target)
-  }
-})
-
 test('the skip link is the first stop and moves focus to the main content', async ({ page }) => {
-  await page.goto('/yuvako')
+  await page.goto('/')
   await page.keyboard.press('Tab')
   const skip = page.getByRole('link', { name: 'Skip to main content' })
   await expect(skip).toBeFocused()
@@ -94,179 +49,4 @@ test('production pages carry a Content-Security-Policy limited to the site itsel
   expect(csp).toContain("default-src 'self'")
   expect(csp).toContain("connect-src 'self'")
   expect(csp).not.toMatch(/https?:/)
-})
-
-test('links that leave the site ask first ("You are leaving this site")', async ({
-  page,
-  context,
-}) => {
-  // Serve the bundle with an external link added to the Yuvako prasang, as if a content editor had added one.
-  await page.route(/\/assets\/index-[\w-]+\.js$/, async (route) => {
-    const response = await route.fetch()
-    const body = (await response.text()).replace(
-      'written only to test the site.',
-      'written only to test the site. [An example link](https://example.org/reading)',
-    )
-    await route.fulfill({ response, body })
-  })
-  const external: string[] = []
-  page.on('request', (r) => {
-    if (r.url().startsWith('https://example.org')) external.push(r.url())
-  })
-  await context.route('https://example.org/**', (route) =>
-    route.fulfill({ status: 200, contentType: 'text/html', body: '<title>Elsewhere</title>' }),
-  )
-  await page.goto('/yuvako/prasang/lamp-by-the-window')
-  const link = page.getByRole('button', { name: /An example link/ })
-  await link.click()
-  const dialog = page.getByRole('dialog', { name: 'You are leaving this site' })
-  await expect(dialog).toBeVisible()
-  await expect(dialog).toContainText('example.org')
-  await expect(dialog.getByRole('button', { name: 'Stay here' })).toBeFocused()
-  await expectNoAxeViolations(page)
-  await page.keyboard.press('Escape')
-  await expect(dialog).toBeHidden()
-  expect(external).toEqual([])
-
-  await link.click()
-  const go = dialog.getByRole('link', { name: 'Continue' })
-  await expect(go).toHaveAttribute('rel', 'noopener noreferrer')
-  const [popup] = await Promise.all([page.waitForEvent('popup'), go.click()])
-  await popup.waitForLoadState()
-  expect(popup.url()).toBe('https://example.org/reading')
-})
-
-test.describe('no accessibility violations in game and story states', () => {
-  test('story ending and pill game screens', async ({ page }) => {
-    await page.goto('/bhulkao/scenario/homework-time')
-    await page.getByRole('button', { name: 'Play the game now' }).click()
-    await page.getByRole('button', { name: 'Keep playing' }).click()
-    await page.getByRole('button', { name: 'Play until bedtime' }).click()
-    await expectNoAxeViolations(page)
-
-    await page.goto('/yuvako/activity/pills')
-    await page.getByRole('button', { name: /Red pill/ }).click()
-    await expectNoAxeViolations(page)
-    // The first card with its timeline played and every row open.
-    for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Then what?' }).click()
-    for (const summary of await page.getByTestId('pill-game').locator('summary').all())
-      await summary.click()
-    await expectNoAxeViolations(page)
-    // The second card, on "Try instead".
-    await page.getByRole('button', { name: 'Next' }).click()
-    await page.getByRole('button', { name: 'Try instead' }).click()
-    await expectNoAxeViolations(page)
-    for (let i = 0; i < 4; i++) await page.getByRole('button', { name: 'Next' }).click()
-    // The recap after the last card, then the landing screen again.
-    await expect(page.getByRole('heading', { name: 'The red pill, in brief' })).toBeFocused()
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: 'Start over' }).click()
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: /Blue pill/ }).click()
-    await expect(page.getByRole('heading', { name: /^Nice try!/ })).toBeVisible()
-    await page.waitForTimeout(2600) // past the toss and the green pill's landing
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: /Green pill/ }).click()
-    await page.getByRole('button', { name: 'I’ll try this' }).click()
-    for (const summary of await page.getByTestId('pill-game').locator('summary').all())
-      await summary.click()
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: 'Next' }).click()
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: 'Next' }).click()
-    await expectNoAxeViolations(page)
-    // The plan after the last page, with one solution chosen.
-    await page.getByRole('button', { name: 'Next' }).click()
-    await expect(page.getByRole('heading', { name: 'Your plan' })).toBeFocused()
-    await expectNoAxeViolations(page)
-  })
-
-  test('Yuvako scenario ending, with the choices taken and the endings found', async ({ page }) => {
-    await page.goto('/yuvako/scenario/one-am-exam')
-    await page.getByRole('button', { name: 'Put the phone away now' }).click()
-    await page.getByRole('button', { name: 'Check it one last time' }).click()
-    await page.getByRole('button', { name: 'Stop, even though sleep feels far away' }).click()
-    await expect(page.getByRole('region', { name: /^Endings found/ })).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-    await expectTapTargets(page, 44)
-    await page.getByRole('button', { name: 'ગુજરાતી' }).click()
-    await expect(page.getByRole('region', { name: /^મળેલા અંત/ })).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-  })
-
-  test('the lesson the scenarios share: ready to reveal, then revealed', async ({ page }) => {
-    // Two scenarios already finished in this tab (set once, before the first page).
-    await page.addInitScript(() => {
-      if (sessionStorage.getItem('outreach.scenario.endings')) return
-      sessionStorage.setItem(
-        'outreach.scenario.endings',
-        JSON.stringify({ 'one-am-exam': ['calm'], 'group-chat-joke': ['silence'] }),
-      )
-    })
-    await page.goto('/yuvako/scenario/extra-change')
-    await page.getByRole('button', { name: 'Stop and count it again' }).click()
-    await page.getByRole('button', { name: 'Hand the ₹500 back to the shopkeeper' }).click()
-    const shared = page.getByRole('region', { name: /^The lesson they share/ })
-    await expect(shared.getByRole('button', { name: 'Reveal the lesson' })).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-    await expectTapTargets(page, 44)
-    await shared.getByRole('button', { name: 'Reveal the lesson' }).click()
-    await expect(shared.getByRole('heading', { level: 3 })).toBeFocused()
-    // Let the reveal's fade-in finish: contrast is checked at full opacity.
-    await shared
-      .locator('[data-just-revealed]')
-      .evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)))
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-
-    await page.goto('/yuvako/scenario')
-    await expect(shared.getByRole('heading', { level: 3 })).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-    await expectTapTargets(page, 44)
-    await page.getByRole('button', { name: 'ગુજરાતી' }).click()
-    await expect(page.getByRole('region', { name: /^સહિયારો બોધ/ })).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-  })
-
-  test('word game result and doodle game over, in Gujarati', async ({ page }) => {
-    test.setTimeout(60_000)
-    await page.addInitScript(() => {
-      localStorage.setItem('outreach.lang', 'gu')
-      let n = 0
-      // Kind (below 0.7 = distraction), which item, x (0.5 = middle).
-      Math.random = () =>
-        [...((window as unknown as { __bad?: boolean }).__bad ? [0.1, 0.1, 0.5] : [0.9, 0.5, 0.5])][
-          n++ % 3
-        ]!
-    })
-    await page.goto('/yuvako/activity/words')
-    // The game loads after the page shell; keys typed before it mounts are lost.
-    await expect(page.getByTestId('word-board')).toBeVisible()
-    await expectNoAxeViolations(page)
-    for (let i = 0; i < 6; i++) {
-      await page.keyboard.type('zzzzzzzzzz')
-      await page.keyboard.press('Enter')
-    }
-    await expect(page.getByTestId('word-result')).toBeVisible()
-    await expectNoAxeViolations(page)
-    await expectNoHorizontalOverflow(page)
-
-    await page.goto('/bhulkao/activity/doodle')
-    await expectNoAxeViolations(page)
-    await page.getByRole('textbox').fill('આરવ')
-    await page.getByRole('button', { name: 'શરૂ કરો' }).click()
-    await page.getByRole('button', { name: 'થોભો' }).click()
-    await expectNoAxeViolations(page)
-    await page.getByRole('button', { name: 'ફરી ચાલુ કરો' }).click()
-    await page.evaluate(() => {
-      ;(window as unknown as { __bad: boolean }).__bad = true
-    })
-    await expect(page.getByTestId('doodle-over')).toBeVisible({ timeout: 30_000 })
-    await expectNoAxeViolations(page)
-  })
 })

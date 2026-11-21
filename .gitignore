@@ -11,5 +11,4 @@ coverage/
 .env
 .env.*.local
 .env.local
-.firebase/
 .vercel/

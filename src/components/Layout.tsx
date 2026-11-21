@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { useI18n } from '../i18n/context'
-import { sectionFromPath } from '../config/sections'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { PageContext, type PageInfo } from './page-context'
@@ -15,7 +14,6 @@ export function Layout() {
   const [page, setPage] = useState<PageInfo>({ title: '' })
   const mainRef = useRef<HTMLElement>(null)
   const isFirstRender = useRef(true)
-  const section = sectionFromPath(location.pathname)
   const siteTitle = t('site.title')
   const [intro] = useState(introMotionAllowed)
 
@@ -35,11 +33,7 @@ export function Layout() {
   }, [location.pathname])
 
   return (
-    <div
-      className={styles.app}
-      data-section={section ?? 'home'}
-      data-intro={intro ? 'play' : undefined}
-    >
+    <div className={styles.app} data-intro={intro ? 'play' : undefined}>
       <a href="#main" className={styles.skip}>
         {t('nav.skip')}
       </a>

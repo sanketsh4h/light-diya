@@ -42,12 +42,9 @@ export const TRANSLATION_REVIEWED: Record<Lang, boolean> = {
   gu: false,
 }
 
-/** The only keys this site ever writes to localStorage. */
+/** The only key this site ever writes to localStorage. */
 export const STORAGE_KEYS = {
   lang: 'outreach.lang',
-  wordsDaily: 'outreach.words.daily',
-  doodleBest: 'outreach.doodle.best',
-  doodleName: 'outreach.doodle.name',
 } as const
 
 /**
@@ -55,18 +52,3 @@ export const STORAGE_KEYS = {
  * (see src/components/diya-lit.ts). Cleared when the tab closes.
  */
 export const DIYA_LIT_SESSION_KEY = 'outreach.diya.lit'
-
-/**
- * The only cookie this site sets: a Shabd Khoj player's random id and name,
- * saved when they join the streak leaderboard (src/games/words/player.ts).
- */
-export const COOKIES = {
-  wordsPlayer: 'outreach_words_player',
-} as const
-
-/**
- * Whether the intro page's welcome text (in locales/*.json, keys "site.*" and
- * "intro.*") is placeholder copy. While true, the intro page shows the
- * placeholder banner.
- */
-export const INTRO_COPY_IS_PLACEHOLDER = false

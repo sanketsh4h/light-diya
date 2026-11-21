@@ -3,8 +3,8 @@ import { expectNoAxeViolations } from './helpers'
 
 /**
  * The site treats an automated browser as having already lit the intro diya
- * (src/components/diya-lit.ts), so every other test starts on an unveiled
- * page. These tests hide that flag to go through the lighting itself.
+ * (src/components/diya-lit.ts), so every other test starts with it lit.
+ * These tests hide that flag to go through the lighting itself.
  */
 async function visitAsAPerson(page: Page): Promise<void> {
   await page.addInitScript(() => {
@@ -29,13 +29,16 @@ function centre(box: { x: number; y: number; width: number; height: number } | n
 }
 
 test.describe('lighting the intro diya', () => {
-  test('the section cards wait until the diya is lit', async ({ page }) => {
+  test('the page opens on an unlit diya, with no fireworks yet', async ({ page }) => {
     await visitAsAPerson(page)
-    await expect(page.getByRole('link', { name: /Bhulkao/ })).toHaveCount(0)
     await expect(page.getByRole('button', { name: 'Light the diya' })).toBeVisible()
+    await expect(page.getByTestId('fireworks')).toHaveCount(0)
+    await expectNoAxeViolations(page)
   })
 
-  test('dragging the fuljadi onto the wick lights it and opens the sections', async ({ page }) => {
+  test('dragging the fuljadi onto the wick lights it and starts the fireworks', async ({
+    page,
+  }) => {
     await visitAsAPerson(page)
     await page.getByRole('button', { name: 'Light the diya' }).click()
     const fuljadi = page.getByTestId('fuljadi')
@@ -56,12 +59,12 @@ test.describe('lighting the intro diya', () => {
     await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'true')
     await expect(page.getByText('The diya is lit. Welcome.')).toBeVisible()
     await expect(fuljadi).toHaveCount(0)
-    await page.getByRole('link', { name: /Bhulkao/ }).click()
-    await expect(page).toHaveURL(/\/bhulkao$/)
+    await expect(page.getByTestId('fireworks')).toBeVisible()
 
-    // Lit once, it stays lit for the tab.
-    await page.goto('/')
+    // Lit once, it stays lit for the tab, and the fireworks do not replay.
+    await page.reload()
     await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'true')
+    await expect(page.getByTestId('fireworks')).toHaveCount(0)
   })
 
   test('the keyboard alone can light the diya, or put the fuljadi away', async ({ page }) => {
@@ -86,22 +89,18 @@ test.describe('lighting the intro diya', () => {
     await page.keyboard.press('Enter')
     await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'true')
     await expect(page.getByText('The diya is lit. Welcome.')).toBeFocused()
-
-    // The next Tab stop is the first section card.
-    await page.keyboard.press('Tab')
-    await expect(page.getByRole('link', { name: /Bhulkao/ })).toBeFocused()
-    await page.keyboard.press('Enter')
-    await expect(page).toHaveURL(/\/bhulkao$/)
+    await expect(page.getByTestId('fireworks')).toBeVisible()
   })
 
   test.describe('with reduced motion', () => {
     test.use({ reducedMotion: 'reduce' })
-    test('one press lights the diya, with no fuljadi', async ({ page }) => {
+    test('one press lights the diya, with no fuljadi and no fireworks', async ({ page }) => {
       await visitAsAPerson(page)
       await page.getByRole('button', { name: 'Light the diya' }).click()
       await expect(page.getByTestId('diya-lighting')).toHaveAttribute('data-lit', 'true')
       await expect(page.getByTestId('fuljadi')).toHaveCount(0)
-      await expect(page.getByRole('link', { name: /Yuvako/ })).toBeVisible()
+      await expect(page.getByText('The diya is lit. Welcome.')).toBeVisible()
+      await expect(page.getByTestId('fireworks')).toHaveCount(0)
     })
   })
 })

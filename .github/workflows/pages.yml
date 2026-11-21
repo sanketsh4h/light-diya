@@ -34,16 +34,10 @@ jobs:
       # CI does not run on this branch, so check before deploying.
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run validate:strict
       - run: npm test
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
-          # Repository variables (Settings → Secrets and variables → Actions → Variables).
-          API_KEY: ${{ vars.API_KEY }}
-          PROJECT_ID: ${{ vars.PROJECT_ID }}
-          AUTH_DOMAIN: ${{ vars.AUTH_DOMAIN }}
-          APP_ID: ${{ vars.APP_ID }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

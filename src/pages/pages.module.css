@@ -29,15 +29,6 @@
   animation-delay: 900ms;
 }
 
-[data-intro='play'] .sections > li {
-  animation: pop-in 800ms cubic-bezier(0.2, 0.8, 0.25, 1.15) both;
-  animation-delay: 950ms;
-}
-
-[data-intro='play'] .sections > li + li {
-  animation-delay: 1100ms;
-}
-
 @keyframes pop-in {
   from {
     opacity: 0;
@@ -46,44 +37,6 @@
 
   to {
     opacity: 1;
-    transform: none;
-  }
-}
-
-.heroLamp {
-  width: auto;
-  height: clamp(150px, 30vw, 230px);
-  margin: 0 auto;
-}
-
-/* Section cards stay veiled until the intro diya is lit. */
-.unveil {
-  transition:
-    opacity 900ms ease,
-    filter 900ms ease,
-    transform 900ms ease;
-}
-
-.unveil[data-unveiled='false'] {
-  opacity: 0.28;
-  filter: blur(2px);
-  transform: translateY(8px);
-  pointer-events: none;
-}
-
-.unveil[data-unveiled='true'] {
-  opacity: 1;
-  filter: none;
-  transform: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .unveil {
-    transition: opacity 200ms ease;
-  }
-
-  .unveil[data-unveiled='false'] {
-    filter: none;
     transform: none;
   }
 }
@@ -133,65 +86,6 @@
   font-size: 1rem;
   letter-spacing: 0.02em;
   text-transform: none;
-}
-
-/* The two main sections, side by side from tablet width up. */
-.sections {
-  display: grid;
-  gap: var(--space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.sections > li {
-  display: flex;
-}
-
-@media (min-width: 40rem) {
-  .sections {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-/* A thin rule with a label in the middle, between the welcome and the sections. */
-.divider {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0 0 var(--space-5);
-  color: #c9a26a;
-}
-
-.divider > span {
-  flex: 1;
-  height: 1px;
-  background: var(--brand-line);
-}
-
-.divider p {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-:lang(gu) .divider p {
-  font-size: 0.9375rem;
-  letter-spacing: 0.02em;
-}
-
-.lead {
-  font-size: var(--font-size-lead);
-}
-
-.empty {
-  padding: var(--space-4);
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius);
 }
 
 .links {
