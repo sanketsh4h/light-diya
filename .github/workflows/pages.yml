@@ -1,13 +1,15 @@
-# Deploys the site to GitHub Pages (https://<owner>.github.io/<repo>/).
-# Runs after CI passes on main, or by hand from the Actions tab.
-# One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# Deploys this branch (light-diya: the site that opens with the "Light the
+# diya" screen) to GitHub Pages (https://<owner>.github.io/<repo>/).
+# Runs on every push to light-diya, or by hand from the Actions tab.
+# One-time setup, by a repository admin:
+#   1. Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#   2. Settings → Environments → github-pages → Deployment branches and tags:
+#      add "light-diya" (a new Pages site only accepts the default branch).
 name: Deploy to GitHub Pages
 
 on:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
-    branches: [main]
+  push:
+    branches: [light-diya]
   workflow_dispatch:
 
 permissions:
@@ -21,19 +23,19 @@ concurrency:
 
 jobs:
   build:
-    # Never deploy a build whose CI run failed.
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # CI does not run on this branch, so check before deploying.
+      - run: npm run lint
+      - run: npm run typecheck
       - run: npm run validate:strict
+      - run: npm test
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
